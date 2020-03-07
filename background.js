@@ -21,7 +21,7 @@ chrome.runtime.onInstalled.addListener(function() {
 	        var url = URL.createObjectURL(blob);
 	        chrome.downloads.download({
           		url: url,
-          		filename: 'partecipanti.txt'
+          		filename: 'participants.txt'
 	        });
 
             sendResponse({ status: 'completed' });
