@@ -13,7 +13,7 @@ function savepart_main() {
 
 	// alert("Partecipanti al corso:\n\n" + participants_list);
     chrome.runtime.sendMessage({ action: 'download', 
-                                 message: "Partecipanti al corso:\n\n" + participants_list},
+                                 message: "Participants:\n\n" + participants_list},
                                function (response) {
                                    if (response.status != 'completed') {
                                        console.log('Download fallito');
