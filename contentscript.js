@@ -20,6 +20,7 @@ function savepart_main() {
         participants_list = participants_list + name + "\n";
     });
 
+    console.log('Scheduling download');
     chrome.runtime.sendMessage(
       {
          action: 'download',

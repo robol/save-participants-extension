@@ -18,8 +18,9 @@ chrome.runtime.onInstalled.addListener(function() {
         actions: [new chrome.declarativeContent.ShowPageAction()]
       }]);
     });
+});
 
-    chrome.runtime.onMessage.addListener(
+chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
             if (request.action == "download") {
                 let msg = request.message;
@@ -35,4 +36,3 @@ chrome.runtime.onInstalled.addListener(function() {
             }
         }
     );
-});
