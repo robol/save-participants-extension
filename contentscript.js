@@ -62,20 +62,17 @@ function trigger_download(participants) {
     }
 }
 
-function savepart_main() {
+async function savepart_main() {
 
-    teams_participants = microsofot_team_get_participants();
+    let participants = microsofot_team_get_participants();
 
     // In this case, we try to get participants from Google Meets
-    if (teams_participants.length == 0) {
-        google_meet_open_sidebar().then(function() {
-            meet_participants = google_meet_get_participants();
-            trigger_download(meet_participants);
-        });
+    if (participants.length == 0) {
+        await google_meet_open_sidebar();
+        participants.push(google_meet_get_participants());
     }
-    else {
-        trigger_download(teams_participants);
-    }
+
+    trigger_download(participants);
 }
 
 savepart_main();
