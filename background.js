@@ -25,11 +25,18 @@ chrome.runtime.onMessage.addListener(
             if (request.action == "download") {
                 let msg = request.message;
 
+                // Format the date to be appended to the filename
+                let now = new Date();
+                let filename = 'participants-' +
+                  now.getFullYear() + '-' +
+                  (now.getMonth() + 1).toString().padStart(2, "0") + '-' +
+                  now.getDate().toString().padStart(2, "0") + '.txt';
+
 	              var blob = new Blob([msg], {type: "text/plain"});
 	              var url = URL.createObjectURL(blob);
 	              chrome.downloads.download({
               		  url: url,
-              		  filename: 'participants.txt'
+              		  filename: filename
 	              });
 
                 sendResponse({ status: 'completed' });
