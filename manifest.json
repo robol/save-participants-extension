@@ -1,7 +1,7 @@
   {
-    "name": "Save Participants from Teams",
-    "version": "1.3",
-    "description": "This extensions allows to download the list of participants in a meeting in Microsoft Teams as a text file",
+    "name": "Save Participants",
+    "version": "1.5",
+    "description": "This extensions allows to download the list of participants in a meeting in Microsoft Teams or Google Meet as a text file",
     "permissions": ["downloads", "activeTab", "declarativeContent", "storage"],
     "background": {
       "scripts": ["background.js"],

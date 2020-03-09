@@ -1,6 +1,32 @@
-function savepart_main() {
+function google_meet_get_participants() {
+     let participants = [];
 
-    let participants_list = "";
+     // This works for Google Meets, assuming the class names are correct and not
+     // linked to my specific session.
+     Array.from(document.getElementsByClassName('cS7aqe NkoVdd')).forEach(function (div) {
+         var name = div.innerHTML;
+         console.log('Found partecipant: ' + name);
+         participants.push(name);
+     });
+
+     return participants;
+}
+
+function google_meet_open_sidebar() {
+    // For Google Meet, we may try to open the sidebar if we manage
+    let sidebar_btns = document.getElementsByClassName(
+      'uArJ5e UQuaGc kCyAyd kW31ib foXzLb');
+    if (sidebar_btns.length > 0) {
+        sidebar_btns[0].click();
+    }
+
+    return new Promise(function(resolve, reject) {
+        setTimeout(resolve, 500);
+    });
+}
+
+function microsofot_team_get_participants() {
+    let participants = [];
 
     // This code works for Microsoft Teams
     Array.from(document.getElementsByTagName('li')).forEach(function (ll) {
@@ -8,31 +34,48 @@ function savepart_main() {
         if (datatid != null && datatid.includes('participantsInCall')) {
 	        var name = datatid.substr(19); // Skip the prefix. 
 	        console.log('Found partecipant: ' + name);
-	        participants_list = participants_list + name + "\n";
+	        participants.push(name);
         }
     });
 
-    // And this works for Google Meets, assuming the class names are correct and not
-    // linked to my specific session.
-    Array.from(document.getElementsByClassName('cS7aqe NkoVdd')).forEach(function (div) {
-        var name = div.innerHTML;
-        console.log('Found partecipant: ' + name);
-        participants_list = participants_list + name + "\n";
-    });
+    return participants;
+}
 
-    console.log('Scheduling download');
-    chrome.runtime.sendMessage(
-      {
-         action: 'download',
-         message: "Participants:\n\n" + participants_list
-      },
-      function (response) {
-          if (response.status != 'completed') {
-              console.log('Download fallito');
+function trigger_download(participants) {
+    let participants_list = participants.join('\n');
+
+    if (participants.length == 0) {
+      alert('No participants found!\nPlease check that the sidebar containing the list of participants is open.');
+    }
+    else {
+        chrome.runtime.sendMessage(
+          {
+             action: 'download',
+             message: participants_list
+          },
+          function (response) {
+              if (response.status != 'completed') {
+                  console.log('Download fallito');
+              }
           }
-      });
+        );
+    }
+}
 
+function savepart_main() {
 
+    teams_participants = microsofot_team_get_participants();
+
+    // In this case, we try to get participants from Google Meets
+    if (teams_participants.length == 0) {
+        google_meet_open_sidebar().then(function() {
+            meet_participants = google_meet_get_participants();
+            trigger_download(meet_participants);
+        });
+    }
+    else {
+        trigger_download(teams_participants);
+    }
 }
 
 savepart_main();
