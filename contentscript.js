@@ -1,15 +1,43 @@
-function google_meet_get_participants() {
-     let participants = [];
+async function google_meet_get_participants() {
+     let participants_dict = {};
+     
+     // In order to get the complete list of participants, we need
+     // to scroll the list to the bottom.
+     let scrollableElements = document.getElementsByClassName('HALYaf tmIkuc s2gQvd KKjvXb');
+     if (scrollableElements.length == 0) {
+         return [];
+     }
+     let se = scrollableElements[0];
+     se.scrollTo(0, 0);
+     // Wait for the scrolling to happen
+     await new Promise(function (res, rej) { setTimeout(res, 500); });
+     
+     let scrollStep = se.offsetHeight;
+     let scrollUnits = 0;
+     
+     while (scrollUnits <= se.scrollHeight) {
+         console.log(scrollUnits);
+         // This works for Google Meets. We need to scroll down to get them all. The ID
+         // is needed to make sure we do not count someone twice.          
+         Array.from(document.getElementsByClassName('HEu5Ef sMVRZe')).forEach(function (div) {
+             var pid = div.getAttribute('data-participant-id');
+             var labels = div.getElementsByClassName('cS7aqe NkoVdd');
+             if (labels.length > 0) {
+                 var name = labels[0].innerHTML;
+                 console.log('Found partecipant: ' + name + ', ID: ' + pid);
+                 participants_dict[pid] = name;
+             }
+         });
+         
+         se.scrollBy(0, scrollStep);
+         scrollUnits += scrollStep;
+         
+         // Wait for the scrolling to happen
+         await new Promise(function (res, rej) { setTimeout(res, 500); });
+     }
 
-     // This works for Google Meets, assuming the class names are correct and not
-     // linked to my specific session.
-     Array.from(document.getElementsByClassName('cS7aqe NkoVdd')).forEach(function (div) {
-         var name = div.innerHTML;
-         console.log('Found partecipant: ' + name);
-         participants.push(name);
-     });
-
-     return participants;
+     console.log(Object.values(participants_dict));
+     return Object.values(participants_dict);
 }
 
 function google_meet_open_sidebar() {
@@ -42,7 +70,7 @@ function microsofot_team_get_participants() {
 }
 
 function trigger_download(participants) {
-    let participants_list = participants.join('\n');
+    let participants_list = participants.join("\n");
 
     if (participants.length == 0) {
       alert('No participants found!\nPlease check that the sidebar containing the list of participants is open.');
@@ -69,7 +97,7 @@ async function savepart_main() {
     // In this case, we try to get participants from Google Meets
     if (participants.length == 0) {
         await google_meet_open_sidebar();
-        participants.push(google_meet_get_participants());
+        participants = await google_meet_get_participants();
     }
 
     trigger_download(participants);
