@@ -20,7 +20,6 @@ function sp_get_global(name) {
 
 function sp_set_global(name, value) {
     let html = document.getElementsByTagName('html')[0];
-    console.log('Setting ' + name + ' to ' + JSON.stringify(value))
     html.setAttribute('data-' + name,
         JSON.stringify(value));
 }
@@ -38,8 +37,6 @@ function sp_monitor_is_enabled() {
 function sp_monitor_set_enabled(enabled) {
     let html = document.getElementsByTagName('html')[0];
     html.setAttribute('data-sp-monitor', enabled ? 'on' : 'off');
-    console.log('Called sp_monitor_set_enabled with enabled = ' + enabled);
-    console.log('html / data-sp-monitor: ', html.getAttribute('data-sp-monitor'));
 }
 
 // Wait for a precsribed number of milliseconds inside an async function.
@@ -126,22 +123,46 @@ async function sp_microsoft_teams_get_participants() {
 
     await sp_microsoft_teams_open_sidebar();
 
-    // This code works for Microsoft Teams
-    Array.from(document.getElementsByTagName('li')).forEach(function (ll) {
-        let datatid = ll.getAttribute('data-tid');
-        if (datatid != null && datatid.includes('participantsInCall')) {
-          // Get a unique identified for this participants
-          let id_data = ll.getAttribute('id');
-          let participant_id = id_data.substr(12); // Skip the prefix
+		let scrollableElements = document.getElementsByClassName("scrollable simple-scrollbar overflow-visible");
+		let el = scrollableElements[0];
 
-	        let name = datatid.substr(19); // Skip the prefix.
+		let oldTop = -1;
+		let keep_cycling = true;
 
-	        participants[participant_id] = {
-              'id': participant_id,
-              'name': name
-          };
-        }
-    });
+		if (el != undefined) {
+			el.scrollTo(0, 0);
+			await sp_timeout(500);
+		}
+
+		while (keep_cycling) {
+		    // This code works for Microsoft Teams
+		    Array.from(document.getElementsByTagName('li')).forEach(function (ll) {
+		        let datatid = ll.getAttribute('data-tid');
+		        if (datatid != null && datatid.includes('participantsInCall')) {
+		          // Get a unique identified for this participants
+		          let id_data = ll.getAttribute('id');
+		          let participant_id = id_data.substr(12); // Skip the prefix
+
+			        let name = datatid.substr(19); // Skip the prefix.
+
+			        participants[participant_id] = {
+		              'id': participant_id,
+		              'name': name
+		          };
+		        }
+		    });
+
+				if (el != undefined) {
+        	oldTop = el.scrollTop;
+					el.scrollTo(0, oldTop + 500);
+					await sp_timeout(500);
+
+					keep_cycling = oldTop < el.scrollTop;
+				}
+				else {
+					keep_cycling = false;
+				}
+		}
 
     return participants;
 }
@@ -198,11 +219,8 @@ async function sp_download_list() {
 }
 
 async function sp_update_events() {
-    console.log('Running sp_update_event(); monitor = ' + sp_monitor_is_enabled());
 
     let sp_monitor_events = sp_get_global('sp-monitor-events');
-
-    console.log(sp_monitor_events);
     let sp_monitor_last_participants = sp_get_global('sp-monitor-last-participants');
 
     if (sp_monitor_is_enabled()) {
@@ -225,9 +243,6 @@ async function sp_update_events() {
 
         sp_set_global('sp-monitor-last-participants', participants);
 
-        console.log(joined_participants);
-        console.log(left_participants);
-
         // Add relevant events
         if (Object.keys(joined_participants).length > 0) {
             sp_monitor_events.push({
@@ -249,11 +264,9 @@ async function sp_update_events() {
     }
 
     if (sp_monitor_is_enabled()) {
-        setTimeout(sp_update_events, 5000);
+        setTimeout(sp_update_events, 15000);
     }
     else {
-        console.log('Preparing data download');
-        console.log(sp_monitor_events);
         let content = "";
 
         for (var event in sp_monitor_events) {
