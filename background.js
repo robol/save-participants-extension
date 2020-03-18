@@ -6,7 +6,9 @@ chrome.runtime.onInstalled.addListener(function() {
           pageUrl: {hostEquals: 'teams.microsoft.com'},
         })
         ],
-        actions: [new chrome.declarativeContent.ShowPageAction()]
+        actions: [
+          new chrome.declarativeContent.ShowPageAction(),
+        ]
       }]);
 
       // Rule for matching at meet.google.com

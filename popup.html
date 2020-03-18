@@ -1,8 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html style="min-width:400px;">
   <head></head>
   <body>
-    <button id="downloadParticipantsButton">Download the list of participants</button>
+    <h1>List of participants</h1>
+    <table>
+      <tr>
+        <td><button id="downloadParticipantsButton">Download now</button></td>
+        <td>Get a list of the current participants as a text file.</td>
+      </tr>
+      <tr>
+        <td><button id="monitorParticipantsButton">Start monitoring</button></td>
+        <td>Monitor join / leave in real time; click again to stop and download
+          a report of the events during the call.</td>
+      </tr>
+    </table>
     <script src="popup.js"></script>
   </body>
 </html>
