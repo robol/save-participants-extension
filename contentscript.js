@@ -51,6 +51,10 @@ async function sp_timeout(N) {
 async function sp_google_meet_get_participants() {
      let participants = {};
 
+     // Start by opening the sidebar, otherwise the users won't be 
+     // automatically loaded. 
+     await sp_google_meet_open_sidebar();
+
      // In order to get the complete list of participants, we need
      // to scroll the list to the bottom.
      let scrollableElements = document.getElementsByClassName('HALYaf tmIkuc s2gQvd KKjvXb');
@@ -206,7 +210,6 @@ async function sp_get_participants() {
 
   // In this case, we try to get participants from Google Meets
   if (Object.keys(participants).length == 0) {
-      await sp_google_meet_open_sidebar();
       participants = await sp_google_meet_get_participants();
   }
 
@@ -311,7 +314,7 @@ async function sp_start_monitor() {
     sp_set_global('sp-monitor-last-participants', sp_monitor_last_participants);
     sp_set_global('sp-monitor-events', sp_monitor_events);
 
-    setTimeout(sp_update_events, 2000);
+    setTimeout(sp_update_events, 15000);
 }
 
 async function sp_stop_monitor() {
