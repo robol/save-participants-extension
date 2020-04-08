@@ -171,6 +171,38 @@ async function sp_microsoft_teams_get_participants() {
     return participants;
 }
 
+async function sp_microsoft_teams_get_participants_v2() {
+    var sp_teams_listener = null;
+
+    // We only return a Promise that will be resolved then the
+    // code in the page is actually executed
+    let participants = await new Promise(function (resolve, reject) {        
+        let s = document.createElement('script');
+        sp_teams_listener = function(d) {
+            resolve(d.detail.participants);
+        }
+
+        document.addEventListener('sp_microsoft_teams_get_call', sp_teams_listener);
+    
+        // Inject the code into the page
+        s.src = chrome.extension.getURL('get-call.js');
+        (document.head || document.documentElement).appendChild(s);
+    
+        s.onload = function() {
+            s.parentNode.removeChild(s);
+        }
+    });
+
+    if (sp_teams_listener != null) {
+        document.removeEventListener(
+            'sp_microsoft_teams_get_call', 
+            sp_teams_listener
+        );
+    }
+
+    return participants;
+}
+
 function sp_trigger_participants_download(participants) {
   let participants_list = "";
 
@@ -206,7 +238,7 @@ function sp_trigger_download(content) {
 }
 
 async function sp_get_participants() {
-  let participants = await sp_microsoft_teams_get_participants();
+  let participants = await sp_microsoft_teams_get_participants_v2();
 
   // In this case, we try to get participants from Google Meets
   if (Object.keys(participants).length == 0) {
