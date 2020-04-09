@@ -207,7 +207,24 @@ function sp_trigger_participants_download(participants) {
   let participants_list = "";
 
   for (var id in participants) {
-      participants_list = participants_list + participants[id]['name'] + '\n';
+      let line = participants[id]['name'];
+
+      if (participants[id].hasOwnProperty('profile')) {
+          let profile = participants[id].profile;
+          if (profile.isAnonymousUser) {
+              line += " (Utente anonimo)";
+          }
+
+          if (profile.hasOwnProperty('jobTitle')) {
+              line += " - " + profile.jobTitle;
+          }
+
+          if (profile.hasOwnProperty('department')) {
+              line += " - " + profile.jobTitle;
+          }
+      }
+
+      participants_list = participants_list + line + '\n';
   }
 
   if (participants_list == "") {
@@ -238,7 +255,9 @@ function sp_trigger_download(content) {
 }
 
 async function sp_get_participants() {
-  let participants = await sp_microsoft_teams_get_participants_v2();
+  let participants = null;
+
+  participants = await sp_microsoft_teams_get_participants();
 
   // In this case, we try to get participants from Google Meets
   if (Object.keys(participants).length == 0) {
@@ -250,6 +269,11 @@ async function sp_get_participants() {
 
 async function sp_download_list() {
     let participants = await sp_get_participants();
+    sp_trigger_participants_download(participants);
+}
+
+async function sp_download_list_detailed() {
+    let participants = await sp_microsoft_teams_get_participants_v2();
     sp_trigger_participants_download(participants);
 }
 

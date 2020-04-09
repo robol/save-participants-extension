@@ -1,16 +1,17 @@
 // This script is used to obtain the call object from the Angular
 // controller in the page
 
-function sp_microsoft_teams_get_call_handler() {
+async function sp_microsoft_teams_get_call_handler() {
     let call = null;
+    let peopleService = null;
 
     try {
         let stage = angular.element(
             document.getElementsByTagName('calling-stage')[0]
         );
         let controller = stage.controller();
-
         call = controller.call;
+        peopleService = controller.$scope.app.peopleService;
     } catch {
         call = null;
     }
@@ -29,10 +30,22 @@ function sp_microsoft_teams_get_call_handler() {
         // And then the others
         for (i = 0; i < call.participants.length; i++) {
             let user = call.participants[i];
-            participants[user.id] = {
-                'id': user.id,
+            participants[user.mri] = {
+                'id': user.mri,
                 'name': user.displayName
             };
+        }
+
+        // The others have the MRI as id, so we can use it to
+        // get the complete profiles
+        let mris = Object.keys(participants);
+        let profiles = await peopleService.getAllPeopleProfile(mris);
+
+        // Add the profiles to the participants
+        for (i = 0; i < profiles.length; i++) {
+            if (participants.hasOwnProperty(profiles[i].mri)) {
+                participants[profiles[i].mri].profile = profiles[i];
+            }
         }
     }
 

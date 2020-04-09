@@ -22,6 +22,12 @@ downloadParticipantsButton.onclick = function(element) {
   sp_execute_js('sp_download_list();')
 };
 
+var downloadParticipantsDetailedButton = document.getElementById('downloadParticipantsDetailedButton');
+
+downloadParticipantsDetailedButton.onclick = function(element) {
+  sp_execute_js('sp_download_list_detailed();')
+};
+
 var monitorParticipantsButton = document.getElementById('monitorParticipantsButton');
 
 // Update the name of the button
