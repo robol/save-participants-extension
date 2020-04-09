@@ -212,7 +212,7 @@ function sp_trigger_participants_download(participants) {
       if (participants[id].hasOwnProperty('profile')) {
           let profile = participants[id].profile;
           if (profile.isAnonymousUser) {
-              line += " (Utente anonimo)";
+              line += " (Anonymous user)";
           }
 
           if (profile.hasOwnProperty('jobTitle')) {
@@ -220,7 +220,7 @@ function sp_trigger_participants_download(participants) {
           }
 
           if (profile.hasOwnProperty('department')) {
-              line += " - " + profile.jobTitle;
+              line += " - " + profile.department;
           }
       }
 

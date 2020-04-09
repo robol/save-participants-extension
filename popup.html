@@ -1,8 +1,59 @@
 <!DOCTYPE html>
 <html style="min-width:400px;">
-  <head></head>
+  <head>
+    <style>
+      /*
+       * colors: #5533FF, #BB33FF, #FF33DD, #FF3377, #FF5533, #FFBB33
+      */
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        font-size: 18px;
+        background: #5533FF;
+        margin: 0px;
+        color: white;
+        padding: 10px;
+      }
+
+      #menu {
+        padding: 10px;
+      }
+
+      td {
+        padding: 5px;
+      }
+
+      button {
+        box-shadow: 0px 1px 0px 0px #fff6af;
+        background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+        background-color:#ffec64;
+        border-radius:6px;
+        border:1px solid #ffaa22;
+        display:inline-block;
+        cursor:pointer;
+        color:#333333;
+        padding:6px 24px;
+        text-decoration:none;
+        text-shadow:0px 1px 0px #ffee66;
+      }
+
+      button:hover {
+        background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+        background-color:#ffab23;
+      }
+
+      button:active {
+        position:relative;
+        top:1px;
+      }
+    </style>
+  </head>
   <body>
-    <h1>List of participants</h1>
+    <h1>Save participants</h1>
+    <div id="menu">
     <table>
       <tr>
         <td><button id="downloadParticipantsButton">Download now</button></td>
@@ -18,7 +69,20 @@
         <td><strong>Experimental:</strong> Download a list with more details included; only works in Microsoft Teams.
         </td>
       </tr>
-    </table>
+      <tr>
+        <td colspan="2" style="text-align: right;">
+          <a href="https://github.com/robol/save-participants-extension/issues" target="_blank">
+            Report a bug
+          </a> /  
+          <a href="https://github.com/robol/save-participants-extension" target="_blank">
+            Get the source code
+          </a> / 
+          <a href="mailto:leo@robol.it" target="_blank">
+            Get in touch
+          </a>
+        </td>
+      </tr>
+    </table></div>
     <script src="popup.js"></script>
   </body>
 </html>
