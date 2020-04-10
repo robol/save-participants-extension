@@ -108,66 +108,6 @@ async function sp_google_meet_open_sidebar() {
     await sp_timeout(500);
 }
 
-async function sp_microsoft_teams_open_sidebar() {
-    let roster = document.getElementsByTagName('calling-roster')[0];
-
-    if (roster == undefined || roster.classList.contains('ng-hide')) {
-        let btn = document.getElementById('roster-button');
-        if (btn != undefined) {
-            btn.click();
-            await sp_timeout(500);
-        }
-    }
-}
-
-async function sp_microsoft_teams_get_participants() {
-    let participants = {};
-
-    await sp_microsoft_teams_open_sidebar();
-
-    let scrollableElements = document.getElementsByClassName("scrollable simple-scrollbar overflow-visible");
-    let el = scrollableElements[0];
-
-    let oldTop = -1;
-    let keep_cycling = true;
-
-    if (el != undefined) {
-        el.scrollTo(0, 0);
-        await sp_timeout(500);
-    }
-
-    while (keep_cycling) {
-        // This code works for Microsoft Teams
-        Array.from(document.getElementsByTagName('li')).forEach(function(ll) {
-            let datatid = ll.getAttribute('data-tid');
-            if (datatid != null && datatid.includes('participantsInCall')) {
-                // Get a unique identified for this participants
-                let id_data = ll.getAttribute('id');
-                let participant_id = id_data.substr(12); // Skip the prefix
-
-                let name = datatid.substr(19); // Skip the prefix.
-
-                participants[participant_id] = {
-                    'id': participant_id,
-                    'name': name
-                };
-            }
-        });
-
-        if (el != undefined) {
-            oldTop = el.scrollTop;
-            el.scrollTo(0, oldTop + 500);
-            await sp_timeout(500);
-
-            keep_cycling = oldTop < el.scrollTop;
-        } else {
-            keep_cycling = false;
-        }
-    }
-
-    return participants;
-}
-
 async function sp_microsoft_teams_get_participants_v2() {
     var sp_teams_listener = null;
 
