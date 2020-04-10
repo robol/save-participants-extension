@@ -200,13 +200,16 @@ async function sp_microsoft_teams_get_participants_v2() {
     return participants;
 }
 
-function sp_trigger_participants_download(participants) {
+function sp_trigger_participants_download(participants, detailed) {
     let participants_list = "";
 
     for (var id in participants) {
         let line = participants[id]['name'];
 
-        if (participants[id].hasOwnProperty('profile')) {
+        // The extra data is only shown in the case the user requests the 
+        // detailed version of the list -- as of now this only loaded for
+        // Microsoft Teams, and not supported in Google Meet.
+        if (participants[id].hasOwnProperty('profile') && detailed) {
             let profile = participants[id].profile;
             if (profile.isAnonymousUser) {
                 line += " (Anonymous user)";
@@ -251,7 +254,7 @@ function sp_trigger_download(content) {
 async function sp_get_participants() {
     let participants = null;
 
-    participants = await sp_microsoft_teams_get_participants();
+    participants = await sp_microsoft_teams_get_participants_v2();
 
     // In this case, we try to get participants from Google Meets
     if (Object.keys(participants).length == 0) {
@@ -263,12 +266,12 @@ async function sp_get_participants() {
 
 async function sp_download_list() {
     let participants = await sp_get_participants();
-    sp_trigger_participants_download(participants);
+    sp_trigger_participants_download(participants, false);
 }
 
 async function sp_download_list_detailed() {
-    let participants = await sp_microsoft_teams_get_participants_v2();
-    sp_trigger_participants_download(participants);
+    let participants = await sp_get_participants();
+    sp_trigger_participants_download(participants, true);
 }
 
 async function sp_update_events() {
