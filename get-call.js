@@ -50,7 +50,7 @@ async function sp_microsoft_teams_get_call_handler() {
     }
 
     let event = new CustomEvent('sp_microsoft_teams_get_call', {
-        detail: { 
+        detail: {
             'participants': participants
         }
     });
