@@ -222,6 +222,10 @@ function sp_trigger_participants_download(participants, detailed) {
             if (profile.hasOwnProperty('department')) {
                 line += " - " + profile.department;
             }
+
+            if (profile.hasOwnProperty('email')) {
+                line += " - " + profile.email;
+            }
         }
 
         participants_list = participants_list + line + '\n';

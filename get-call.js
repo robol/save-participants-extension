@@ -22,9 +22,10 @@ async function sp_microsoft_teams_get_call_handler() {
     if (call != null) {
         // Find myself first
         let myself = call.currentUserSkypeIdentity;
-        participants[myself.id] = {
+        let mymri  = call.callerMri;
+        participants[mymri] = {
             'name': myself.displayName,
-            'id': myself.id
+            'id': mymri
         };
 
         // And then the others
