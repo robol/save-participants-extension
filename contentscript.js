@@ -6,20 +6,34 @@ chrome.runtime.onMessage.addListener(function(sender, message, sendResponse) {
     }
 });
 
-function sp_get_global(name) {
-    let html = document.getElementsByTagName('html')[0];
+async function sp_get_global(name) {
+    return new Promise((res, rej) => {
+        data = {}; data[name] = null;
 
-    if (!html.hasAttribute('data-' + name)) {
-        return null;
-    } else {
-        return JSON.parse(html.getAttribute('data-' + name));
-    }
+        chrome.storage.local.get(data, function(items) {
+            if (chrome.runtime.lastError) {
+                rej('Failed to get key: ' + name);
+            }
+            else {
+                res(JSON.parse(items[name]));
+            }
+        });
+    });
 }
 
-function sp_set_global(name, value) {
-    let html = document.getElementsByTagName('html')[0];
-    html.setAttribute('data-' + name,
-        JSON.stringify(value));
+async function sp_set_global(name, value) {
+    return new Promise((res, rej) => {
+        data = {}; data[name] = JSON.stringify(value);
+
+        chrome.storage.local.set(data, function() {
+            if (chrome.runtime.lastError) {
+                rej('Failed to set key: ' + name);
+            }
+            else {
+                res();
+            }
+        });
+    })
 }
 
 function sp_monitor_is_enabled() {
@@ -220,8 +234,8 @@ async function sp_download_list_detailed() {
 
 async function sp_update_events() {
 
-    let sp_monitor_events = sp_get_global('sp-monitor-events');
-    let sp_monitor_last_participants = sp_get_global('sp-monitor-last-participants');
+    let sp_monitor_events = await sp_get_global('sp-monitor-events');
+    let sp_monitor_last_participants = await sp_get_global('sp-monitor-last-participants');
 
     if (sp_monitor_is_enabled()) {
         let participants = await sp_get_participants();
@@ -241,7 +255,7 @@ async function sp_update_events() {
             }
         }
 
-        sp_set_global('sp-monitor-last-participants', participants);
+        await sp_set_global('sp-monitor-last-participants', participants);
 
         // Add relevant events
         if (Object.keys(joined_participants).length > 0) {
@@ -260,7 +274,7 @@ async function sp_update_events() {
             });
         }
 
-        sp_set_global('sp-monitor-events', sp_monitor_events);
+        await sp_set_global('sp-monitor-events', sp_monitor_events);
     }
 
     if (sp_monitor_is_enabled()) {
@@ -292,6 +306,11 @@ async function sp_update_events() {
             }
         }
 
+        // Before terminating, reset the memory so that it won't be found 
+        // on the next startup. 
+        await sp_set_global('sp-monitor-last-participants', null);
+        await sp_set_global('sp-monitor-events', null);
+
         sp_trigger_download(content);
     }
 }
@@ -299,18 +318,28 @@ async function sp_update_events() {
 async function sp_start_monitor() {
     sp_monitor_set_enabled(true);
 
-    let sp_monitor_last_participants = await sp_get_participants();
+    // Check if we find a running session in memory
+    let old_participants = await sp_get_global('sp-monitor-last-participants');
+    if (old_participants != null) {
+        console.log('SAVE_PARTICIPANTS // Found old monitor session in memory: recovering');
 
-    let sp_monitor_events = [{
-        'timestamp': new Date(),
-        'event': 'join',
-        'participants': sp_monitor_last_participants
-    }];
+        alert("Found an old monitor session in memory: continuing. \n\n" + 
+            "If you wish to start a new session please stop and start again.");
+    }
+    else {
+        let sp_monitor_last_participants = await sp_get_participants();
 
-    sp_set_global('sp-monitor-last-participants', sp_monitor_last_participants);
-    sp_set_global('sp-monitor-events', sp_monitor_events);
+        let sp_monitor_events = [{
+            'timestamp': new Date(),
+            'event': 'join',
+            'participants': sp_monitor_last_participants
+        }];
 
-    setTimeout(sp_update_events, 15000);
+        await sp_set_global('sp-monitor-last-participants', sp_monitor_last_participants);
+        await sp_set_global('sp-monitor-events', sp_monitor_events);
+    }
+
+    setTimeout(sp_update_events, 10000);
 }
 
 async function sp_stop_monitor() {
