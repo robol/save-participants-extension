@@ -15,10 +15,10 @@ appear in the Chrome Web Store, you can clone this repository by
 ```
 $ git clone https://github.com/robol/save-participants-extension.git
 ```
-of download it using the ''Clone or download'' -> ''Download ZIP'' button
+of download it using the **Clone or download** -> **Download ZIP** button
 from the Github page, and decompress it in a folder. Then, go to the Chrome 
 extension page and enable developer mode (top-right toggle switch), and 
-click ''Load unpacked extension''; select the folder you obtained at the
+click **Load unpacked extension**, and select the folder you obtained at the
 previous step. 
 
 
