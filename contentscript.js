@@ -69,12 +69,11 @@ async function sp_google_meet_get_participants() {
 
     // In order to get the complete list of participants, we need
     // to scroll the list to the bottom.
-    let scrollableElements = document.getElementsByClassName('HALYaf tmIkuc s2gQvd KKjvXb');
-    if (scrollableElements.length == 0) {
+    let se = document.querySelector('[role="list"]');
+    if (se === null) {
         return [];
     }
 
-    let se = scrollableElements[0];
     se.scrollTo(0, 0);
 
     // Wait for the scrolling to happen
@@ -87,9 +86,9 @@ async function sp_google_meet_get_participants() {
 
         // This works for Google Meets. We need to scroll down to get them all. The ID
         // is needed to make sure we do not count someone twice.
-        Array.from(document.getElementsByClassName('HEu5Ef sMVRZe')).forEach(function(div) {
+        Array.from(se.querySelectorAll('[role="listitem"]')).forEach(function(div) {
             var pid = div.getAttribute('data-participant-id');
-            var labels = div.getElementsByClassName('cS7aqe NkoVdd');
+            var labels = div.getElementsByClassName('ZjFb7c');
             if (labels.length > 0) {
                 var name = labels[0].innerHTML;
 
@@ -113,8 +112,8 @@ async function sp_google_meet_get_participants() {
 async function sp_google_meet_open_sidebar() {
     // For Google Meet, we may try to open the sidebar if we manage
     let sidebar_btns = document.getElementsByClassName(
-        'uArJ5e UQuaGc kCyAyd kW31ib foXzLb');
-
+        'uArJ5e UQuaGc kCyAyd QU4Gid foXzLb IeuGXd');
+        
     if (sidebar_btns.length > 0) {
         sidebar_btns[0].click();
     }
