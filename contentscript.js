@@ -69,9 +69,14 @@ async function sp_google_meet_get_participants() {
 
     // In order to get the complete list of participants, we need
     // to scroll the list to the bottom.
-    let se = document.querySelector('[role="list"]');
-    if (se === null) {
+    let se = document.querySelectorAll('[role="list"]');
+    if (se.length == 0) {
         return [];
+    }
+    else {
+        // If a user raise the hand we may have multiple user lists; in this way, 
+        // we shoule be fetching the right one. 
+        se = se[se.length - 1];
     }
 
     se.scrollTo(0, 0);
@@ -83,7 +88,6 @@ async function sp_google_meet_get_participants() {
     let scrollUnits = 0;
 
     while (scrollUnits <= se.scrollHeight) {
-
         // This works for Google Meets. We need to scroll down to get them all. The ID
         // is needed to make sure we do not count someone twice.
         Array.from(se.querySelectorAll('[role="listitem"]')).forEach(function(div) {
