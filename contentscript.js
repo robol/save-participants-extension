@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener(function(sender, message, sendResponse) {
-    if (message = 'sp-monitor-is-enabled') {
+    if (message == 'sp-monitor-is-enabled') {
         sendResponse(sp_monitor_is_enabled());
     } else {
         console.log('Invalid message received');
@@ -74,7 +74,7 @@ async function sp_google_meet_get_participants() {
         return [];
     }
     else {
-        // If a user raise the hand we may have multiple user lists; in this way, 
+        // If a user raises the hand we may have multiple user lists; in this way, 
         // we shoule be fetching the right one. 
         se = se[se.length - 1];
     }
@@ -191,14 +191,15 @@ function sp_trigger_participants_download(participants, detailed) {
     if (participants_list == "") {
         alert('No participants found!\nPlease check that the sidebar containing the list of participants is open.');
     } else {
-        sp_trigger_download(participants_list);
+        sp_trigger_download(participants_list, false);
     }
 }
 
-function sp_trigger_download(content) {
+function sp_trigger_download(content, monitor) {
     chrome.runtime.sendMessage({
             action: 'download',
-            message: content
+            message: content,
+            monitor: monitor
         },
         function(response) {
             if (chrome.runtime.lastError) {
@@ -314,7 +315,7 @@ async function sp_update_events() {
         await sp_set_global('sp-monitor-last-participants', null);
         await sp_set_global('sp-monitor-events', null);
 
-        sp_trigger_download(content);
+        sp_trigger_download(content, true);
     }
 }
 
