@@ -2,7 +2,7 @@
 
 set -e
 
-FILES="background.js contentscript.js COPYING get-call.js manifest.json popup.html popup.js README.md"
+FILES="background.js contentscript.js COPYING get-call.js manifest.json popup.html popup.js README.md images/*"
 
 VERSION=$(grep \"version\" manifest.json  | cut -d ':' -f2 | cut -d '"' -f2)
 FILENAME="save-participants-${VERSION}.zip"
